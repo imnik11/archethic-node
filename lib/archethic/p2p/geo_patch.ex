@@ -28,7 +28,21 @@ defmodule ArchEthic.P2P.GeoPatch do
     Enum.take_random(list_char, 3) |> List.to_string()
   end
 
-  defp compute_patch(lat, lon) do
+  def list_of_coordinates() do
+    l = for lat <- 0..90, do: for(lon <- 0..180, do: {lat, lon})
+
+    l = List.flatten(l) |> Enum.uniq()
+
+    patches =
+      Enum.map(l, fn {x, y} ->
+        compute_patch(y, x)
+      end)
+
+    patches |> Enum.to_list() |> Enum.uniq()
+    IO.inspect(patches)
+  end
+
+  def compute_patch(lat, lon) do
     lat_sign = sign(lat)
     lon_sign = sign(lon)
 
@@ -56,25 +70,31 @@ defmodule ArchEthic.P2P.GeoPatch do
     patch
   end
 
-  defp index_patch([f_i, s_i]) when f_i > 0.5 and f_i <= 1 and s_i < -0.5 and s_i >= -1, do: '0'
-  defp index_patch([f_i, s_i]) when f_i > 0.5 and f_i <= 1 and s_i < 0 and s_i >= -0.5, do: '1'
-  defp index_patch([f_i, s_i]) when f_i > 0.5 and f_i <= 1 and s_i < 0.5 and s_i >= 0, do: '2'
-  defp index_patch([f_i, s_i]) when f_i > 0.5 and f_i <= 1 and s_i < 1 and s_i >= 0.5, do: '3'
+  defp index_patch([f_i, s_i]) when f_i >= 0.5 and f_i <= 1 and s_i <= -0.5 and s_i >= -1, do: '0'
+  defp index_patch([f_i, s_i]) when f_i >= 0.5 and f_i <= 1 and s_i <= 0 and s_i >= -0.5, do: '1'
+  defp index_patch([f_i, s_i]) when f_i >= 0.5 and f_i <= 1 and s_i <= 0.5 and s_i >= 0, do: '2'
+  defp index_patch([f_i, s_i]) when f_i >= 0.5 and f_i <= 1 and s_i <= 1 and s_i >= 0.5, do: '3'
 
-  defp index_patch([f_i, s_i]) when f_i > 0 and f_i <= 0.5 and s_i < -0.5 and s_i >= -1, do: '4'
-  defp index_patch([f_i, s_i]) when f_i > 0 and f_i <= 0.5 and s_i < 0 and s_i >= -0.5, do: '5'
-  defp index_patch([f_i, s_i]) when f_i > 0 and f_i <= 0.5 and s_i < 0.5 and s_i >= 0, do: '6'
-  defp index_patch([f_i, s_i]) when f_i > 0 and f_i <= 0.5 and s_i < 1 and s_i >= 0.5, do: '7'
+  defp index_patch([f_i, s_i]) when f_i >= 0 and f_i <= 0.5 and s_i <= -0.5 and s_i >= -1, do: '4'
+  defp index_patch([f_i, s_i]) when f_i >= 0 and f_i <= 0.5 and s_i <= 0 and s_i >= -0.5, do: '5'
+  defp index_patch([f_i, s_i]) when f_i >= 0 and f_i <= 0.5 and s_i <= 0.5 and s_i >= 0, do: '6'
+  defp index_patch([f_i, s_i]) when f_i >= 0 and f_i <= 0.5 and s_i <= 1 and s_i >= 0.5, do: '7'
 
-  defp index_patch([f_i, s_i]) when f_i > -0.5 and f_i <= 0 and s_i < -0.5 and s_i >= -1, do: '8'
-  defp index_patch([f_i, s_i]) when f_i > -0.5 and f_i <= 0 and s_i < 0 and s_i >= -0.5, do: '9'
-  defp index_patch([f_i, s_i]) when f_i > -0.5 and f_i <= 0 and s_i < 0.5 and s_i >= 0, do: 'A'
-  defp index_patch([f_i, s_i]) when f_i > -0.5 and f_i <= 0 and s_i < 1 and s_i >= 0.5, do: 'B'
+  defp index_patch([f_i, s_i]) when f_i >= -0.5 and f_i <= 0 and s_i <= -0.5 and s_i >= -1,
+    do: '8'
 
-  defp index_patch([f_i, s_i]) when f_i > -1 and f_i <= -0.5 and s_i < -0.5 and s_i >= -1, do: 'C'
-  defp index_patch([f_i, s_i]) when f_i > -1 and f_i <= -0.5 and s_i < 0 and s_i >= -0.5, do: 'D'
-  defp index_patch([f_i, s_i]) when f_i > -1 and f_i <= -0.5 and s_i < 0.5 and s_i >= 0, do: 'E'
-  defp index_patch([f_i, s_i]) when f_i > -1 and f_i <= -0.5 and s_i < 1 and s_i >= 0.5, do: 'F'
+  defp index_patch([f_i, s_i]) when f_i >= -0.5 and f_i <= 0 and s_i <= 0 and s_i >= -0.5, do: '9'
+  defp index_patch([f_i, s_i]) when f_i >= -0.5 and f_i <= 0 and s_i <= 0.5 and s_i >= 0, do: 'A'
+  defp index_patch([f_i, s_i]) when f_i >= -0.5 and f_i <= 0 and s_i <= 1 and s_i >= 0.5, do: 'B'
+
+  defp index_patch([f_i, s_i]) when f_i >= -1 and f_i <= -0.5 and s_i <= -0.5 and s_i >= -1,
+    do: 'C'
+
+  defp index_patch([f_i, s_i]) when f_i >= -1 and f_i <= -0.5 and s_i <= 0 and s_i >= -0.5,
+    do: 'D'
+
+  defp index_patch([f_i, s_i]) when f_i >= -1 and f_i <= -0.5 and s_i <= 0.5 and s_i >= 0, do: 'E'
+  defp index_patch([f_i, s_i]) when f_i >= -1 and f_i <= -0.5 and s_i <= 1 and s_i >= 0.5, do: 'F'
 
   defp sign(number) when number < 0, do: -1
   defp sign(number) when number >= 0, do: 1
